@@ -1,0 +1,17 @@
+[project]
+name = "file"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dotenv>=0.9.9",
+    "faiss-cpu>=1.11.0",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.23",
+    "langchain-openai>=0.3.16",
+    "langchainhub>=0.1.21",
+    "pypdf>=5.4.0",
+    "sentence-transformers>=4.1.0",
+    "streamlit>=1.45.0",
+]
