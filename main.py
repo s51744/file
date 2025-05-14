@@ -19,10 +19,11 @@ st.title("📚 國立宜蘭大學行事曆查詢系統")
 st.markdown("自然語言提問，系統將自動查找行事曆內容並回答問題。")
 
 # 初始化狀態
-if 'retriever_chain' not in st.session_state:
+if "retriever_chain" not in st.session_state:
     st.session_state.retriever_chain = None
     st.session_state.pdf_loaded = False
     st.session_state.chat_history = []
+
 
 # 初始化 RAG 系統
 def initialize_rag_system():
@@ -43,11 +44,15 @@ def initialize_rag_system():
         docs = text_splitter.split_documents(documents)
 
         # 3. 使用本地 Embeddings（sentence-transformers）
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
 
         # 4. 建立向量資料庫（FAISS）
         if os.path.exists(faiss_index_path):
-            vectorstore = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
+            vectorstore = FAISS.load_local(
+                faiss_index_path, embeddings, allow_dangerous_deserialization=True
+            )
         else:
             vectorstore = FAISS.from_documents(docs, embeddings)
             vectorstore.save_local(faiss_index_path)
@@ -66,14 +71,17 @@ def initialize_rag_system():
         prompt = ChatPromptTemplate.from_template(template)
 
         # 6. 使用本地模型（透過 Ollama）
-        llm = ChatOllama(model="deepseek-r1:8b", temperature=0)
+        llm = ChatOllama(model="llama3.2", temperature=0)
 
         # 7. 創建文檔處理鏈與檢索鏈
         doc_chain = create_stuff_documents_chain(llm, prompt)
-        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        retriever = vectorstore.as_retriever(
+            search_type="similarity", search_kwargs={"k": 5}
+        )
         st.session_state.retriever_chain = create_retrieval_chain(retriever, doc_chain)
         st.session_state.pdf_loaded = True
         return True
+
 
 # 側邊欄
 with st.sidebar:
@@ -87,7 +95,7 @@ with st.sidebar:
         "五月有哪些活動？",
         "什麼時候開學？",
         "中秋節放假嗎？",
-        "期中考是什麼時候？"
+        "期中考是什麼時候？",
     ]:
         if st.button(q):
             st.session_state.user_question = q
@@ -107,7 +115,9 @@ for q, a in st.session_state.chat_history:
         st.write(a)
 
 # 提問區
-user_question = st.chat_input("請輸入您的問題...", disabled=not st.session_state.pdf_loaded)
+user_question = st.chat_input(
+    "請輸入您的問題...", disabled=not st.session_state.pdf_loaded
+)
 if user_question:
     with st.chat_message("user"):
         st.write(user_question)
